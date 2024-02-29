@@ -29,8 +29,8 @@ cap = cv2.VideoCapture(0)
 #Gets fps of your camera    
 fps = cap.get(cv2.CAP_PROP_FPS)
 print("fps:", fps)
-#If your camera can achieve 60 fps
-#Else just have this be 1-30 fps
+# If your camera can achieve 60 fps
+# Else just have this be 1-30 fps
 cap.set(cv2.CAP_PROP_FPS, 60)
 
 while True:
@@ -61,8 +61,12 @@ while True:
     name_in_boxes = False
     for box in scouter_name_boxes:
         if name.lower() == box.text.lower():
-             box.completed = True
-             name_in_boxes = True
+            if box.completed:
+                pyautogui.alert("This person has already submitted a QR code.")
+                break
+            box.completed = True
+            name_in_boxes = True
+            break
     if not name_in_boxes:
          pyautogui.alert("Name does not match up to scouter list.")
             
