@@ -2,8 +2,9 @@ import pygame
 
 pygame.font.init()
 
-COLOR_INACTIVE = pygame.Color('lightskyblue3')
+COLOR_INCOMPLETE = pygame.Color((255, 0, 0))
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
+COLOR_COMPLETED = pygame.Color((0, 255, 0))
 FONT = pygame.font.Font(None, 32)
 
 class InputBox:
@@ -14,6 +15,7 @@ class InputBox:
         self.text = text
         self.txt_surface = FONT.render(text, True, self.color)
         self.active = False
+        self.completed = False
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -24,7 +26,13 @@ class InputBox:
             else:
                 self.active = False
             # Change the current color of the input box.
-            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+            if self.active:
+                self.color = COLOR_ACTIVE
+            elif not self.active and self.complete:
+                self.color = COLOR_COMPLETED
+            else:
+                self.color = COLOR_INCOMPLETE
+
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:

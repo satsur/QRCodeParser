@@ -54,6 +54,9 @@ while True:
     if (len(decoded_info) > 1): # Don't want to scan two QR codes at once
         pyautogui.alert("Make sure there isn't more than ONE QR Code on screen at once!")
 
+    # QR code has been scanned, now process and write to file: 
+        
+
     # Flip image because the frames appeared inverted by default
     frame = np.fliplr(frame)
     frame = np.rot90(frame)
