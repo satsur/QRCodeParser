@@ -16,6 +16,7 @@ pygame.init()
 pygame.display.set_caption("QR Code Parser - Mercury 1089")
 surface = pygame.display.set_mode([1280,720])
 
+
 scouter_name_1 = InputBox(800, 200, 200, 50)
 scouter_name_2 = InputBox(800, 250, 200, 50)
 scouter_name_3 = InputBox(800, 300, 200, 50)
@@ -88,9 +89,16 @@ while True:
         for box in scouter_name_boxes:
                 box.handle_event(event)
 
+    count_completed = 0
     for box in scouter_name_boxes:
+        if box.completed:
+            count_completed++
         box.update()
         box.draw(surface)
+
+    if count_completed == len(scouter_name_boxes):
+        
+
 
     # Show the PyGame surface!
     surface.blit(surf, (0,0))
