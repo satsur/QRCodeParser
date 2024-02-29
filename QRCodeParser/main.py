@@ -2,6 +2,7 @@ import cv2
 import pygame
 import numpy as np
 import pyautogui
+import Processor
 from components.InputBox import InputBox
 
 QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," + \
@@ -54,8 +55,18 @@ while True:
     if (len(decoded_info) > 1): # Don't want to scan two QR codes at once
         pyautogui.alert("Make sure there isn't more than ONE QR Code on screen at once!")
 
-    # QR code has been scanned, now process and write to file: 
-        
+    # QR code has been scanned, now process and write to file, update boxes as needed
+    qr_string = decoded_info[0]
+    name = Processor.get_name(qr_string)
+    name_in_boxes = False
+    for box in scouter_name_boxes:
+        if name.lower() == box.text.lower():
+             box.completed = True
+             name_in_boxes = True
+    if not name_in_boxes:
+         pyautogui.alert("Name does not match up to scouter list.")
+            
+    
 
     # Flip image because the frames appeared inverted by default
     frame = np.fliplr(frame)
