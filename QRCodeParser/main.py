@@ -14,8 +14,8 @@ QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
 dir = filedialog.askdirectory(initialdir="C:", title="Please select a directory") # show an "Open" dialog box and return the path to the selected file
-EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
+EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 
 TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size font
@@ -29,9 +29,10 @@ pygame.display.set_caption("QR Code Parser - Mercury 1089")
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
-file_paths_surf = SMALL_FONT.render(f"Event List: {EVENT_LIST_PATH} \n" +
-                                    f"Setup List: {SETUP_LIST_PATH} \n" +
-                                    f"QR Strings: {QR_STRINGS_PATH}", True, pygame.color((169, 255, 115))) # Light green
+
+setup_list_surf = SMALL_FONT.render(f"Setup List: {SETUP_LIST_PATH}", True, pygame.Color((169, 255, 115)))
+event_list_surf = SMALL_FONT.render(f"Event List: {EVENT_LIST_PATH}", True, pygame.Color((169, 255, 115))) # Light green (169, 255, 115)
+qr_strings_surf = SMALL_FONT.render(f"QR Strings: {QR_STRINGS_PATH}", True, pygame.Color((169, 255, 115)))
 
 # 10 pixel margins between each box (vertically and horizontally)
 BOX_WIDTH = 200
@@ -132,5 +133,8 @@ while True:
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
-    surface.blit(file_paths_surf, (20, SCREEN_HEIGHT - 3 * file_paths_surf.get_height()))
+    # Display file paths in bottom left
+    surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 25))
+    surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 25))
+    surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 20))
     pygame.display.flip()
