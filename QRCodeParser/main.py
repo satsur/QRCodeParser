@@ -13,7 +13,8 @@ QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner
         "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," + \
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-dir = filedialog.askdirectory(initialdir="C:", title="Please select a directory") # show an "Open" dialog box and return the path to the selected file
+# show an "Open" dialog box and return the path to the selected file
+dir = filedialog.askdirectory(initialdir="C:", title="Please select the directory that contains eventList, setupList, and qr_strings")
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
@@ -30,9 +31,9 @@ surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
 
-setup_list_surf = SMALL_FONT.render(f"Setup List: {SETUP_LIST_PATH}", True, pygame.Color((169, 255, 115)))
-event_list_surf = SMALL_FONT.render(f"Event List: {EVENT_LIST_PATH}", True, pygame.Color((169, 255, 115))) # Light green (169, 255, 115)
-qr_strings_surf = SMALL_FONT.render(f"QR Strings: {QR_STRINGS_PATH}", True, pygame.Color((169, 255, 115)))
+setup_list_surf = SMALL_FONT.render(f"SETUP LIST: {SETUP_LIST_PATH}", True, pygame.Color((169, 255, 115)))
+event_list_surf = SMALL_FONT.render(f"EVENT LIST: {EVENT_LIST_PATH}", True, pygame.Color((169, 255, 115))) # Light green (169, 255, 115)
+qr_strings_surf = SMALL_FONT.render(f"QR STRINGS: {QR_STRINGS_PATH}", True, pygame.Color((169, 255, 115)))
 
 # 10 pixel margins between each box (vertically and horizontally)
 BOX_WIDTH = 200
