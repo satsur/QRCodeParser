@@ -20,6 +20,7 @@ QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 
 TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size font
 NORMAL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22) # normal text size font
+SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 12) # small text size font
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
@@ -28,6 +29,9 @@ pygame.display.set_caption("QR Code Parser - Mercury 1089")
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
+file_paths_surf = SMALL_FONT.render(f"Event List: {EVENT_LIST_PATH} \n" +
+                                    f"Setup List: {SETUP_LIST_PATH} \n" +
+                                    f"QR Strings: {QR_STRINGS_PATH}", True, pygame.color((169, 255, 115))) # Light green
 
 # 10 pixel margins between each box (vertically and horizontally)
 BOX_WIDTH = 200
@@ -128,4 +132,5 @@ while True:
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
+    surface.blit(file_paths_surf, (20, SCREEN_HEIGHT - 3 * file_paths_surf.get_height()))
     pygame.display.flip()
