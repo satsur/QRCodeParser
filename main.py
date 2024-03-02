@@ -97,7 +97,7 @@ while True:
                     box.completed = True
                 num_in_boxes = True
         if num_in_boxes:
-            pyautogui.alert("Successfully scanned code for Match " + str(team_number))
+            pyautogui.alert("Successfully scanned code for Team Number " + str(team_number))
         elif not num_in_boxes:
              pyautogui.alert("Team number does not match up to list. Make sure the boxes and QR code have the right information.")
             
