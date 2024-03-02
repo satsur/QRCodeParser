@@ -47,6 +47,9 @@ class InputBox:
             self.color = COLOR_COMPLETED
         else:
             self.color = COLOR_INCOMPLETE
+        
+        # Update text
+        self.txt_surface = self.font.render(self.text, True, FONT_COLOR)
             
         # Resize the box if the text is too long.
         width = max(200, self.txt_surface.get_width()+10)

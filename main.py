@@ -14,7 +14,8 @@ QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
 Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
 # show an "Open" dialog box and return the path to the selected file
-dir = filedialog.askdirectory(initialdir="C:", title="Please select the directory that contains eventList, setupList, and qr_strings")
+STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
+dir = filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
