@@ -1,3 +1,4 @@
 /QRCodeParser/setupList.csv
 /QRCodeParser/eventList.csv
 /QRCodeParser/qrStrings.txt
+*.pyc
