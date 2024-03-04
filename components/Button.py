@@ -2,9 +2,9 @@ import pygame
 
 pygame.font.init()
 
-COLOR_ACTIVE = pygame.Color("white")
-COLOR_HOVER = pygame.Color("red")
-COLOR_DEFAULT = pygame.Color("green")
+COLOR_ACTIVE = pygame.Color((255,120,0))
+COLOR_HOVER = pygame.Color((255,140,0))
+COLOR_DEFAULT = pygame.Color((255,150,0))
 DEFAULT_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22)
 
 class Button:
@@ -40,7 +40,7 @@ class Button:
             self.active = False
             if self.rect.collidepoint(event.pos):
                 self.hovered = True
-            else
+            else:
                 self.hovered = False
 
     def update(self):
@@ -54,21 +54,17 @@ class Button:
             
 
     def draw(self, screen, outline=None):
-        # # Draw the button on the screen
-        # if outline:
-        #     pygame.draw.rect(win, outline, (self.x-2, self.y-2, self.width+4, self.height+4), 0)
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height), 0)
+        # Draw the button on the screen
+        if outline:
+            pygame.draw.rect(screen, outline, (self.x-2, self.y-2, self.width+4, self.height+4), 0)
+        
+        if self.active:
+            pygame.draw.rect(screen, self.color, (self.x, self.y, self.width-4, self.height-4), 0)
+        else:
+            pygame.draw.rect(screen, self.color, (self.x, self.y, self.width-4, self.height-4), 0)
         
         if self.txt_surface != '':
             font = self.font
             self.txt_surface = font.render(self.text, 1, (0, 0, 0))
             screen.blit(self.txt_surface, 
                         (self.x + (self.width/2 - self.txt_surface.get_width()/2), self.y + (self.height/2 - self.txt_surface.get_height()/2)))
-
-    def isOver(self, pos):
-        # Pos is the mouse position or a tuple of (x, y) coordinates
-        if pos[0] > self.x and pos[0] < self.x + self.width:
-            if pos[1] > self.y and pos[1] < self.y + self.height:
-                return True
-            
-        return False

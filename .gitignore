@@ -2,3 +2,4 @@
 /QRCodeParser/eventList.csv
 /QRCodeParser/qrStrings.txt
 *.pyc
+config.yml
