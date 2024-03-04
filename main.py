@@ -137,6 +137,19 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_TAB or event.key == pygame.K_RETURN:
+                for i in range(len(team_number_boxes)):
+                    if team_number_boxes[i].active:
+                        team_number_boxes[i].active = False
+                        # If the current box is not the last box
+                        if (i < len(team_number_boxes)-1):
+                            team_number_boxes[i+1].active = True
+                        # Current box is the last box, so it loops back to the first box
+                        else:
+                            team_number_boxes[0].active = True
+                        break
+
         for box in team_number_boxes:
                 box.handle_event(event)
 
