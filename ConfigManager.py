@@ -1,8 +1,18 @@
 import yaml
 
+# Dict containing cached config from program start
+# Any changes made to config during program runtime will not be reflected in this
+config = None
+
+# Should only be called ONCE at the start of the program
 def load_config():
-    with open("example.yaml") as stream:
+    global config
+    with open("config.yml") as stream:
         try:
-            print(yaml.safe_load(stream))
+           config = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
+
+# Call as many times as necessary, loads the cached config
+def get_config():
+    return config

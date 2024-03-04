@@ -9,16 +9,27 @@ import Processor
 from components.InputBox import InputBox
 from components.Button import Button
 import Utils
+import ConfigManager
+
+pygame.init()
+ConfigManager.load_config()
 
 # ----------------- CONSTANTS -----------------
 
 QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," + \
         "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," + \
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
-Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-# show an "Open" dialog box and return the path to the selected file
-STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
-dir = filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
+
+# Determine if user wants to use the last path or choose a new one:
+last_path = ConfigManager.get_config()['last_path']
+result = pyautogui.confirm(text=f'Would you like to use {last_path} again?', title='Mercury 1089 QR Code Parser', buttons=['Yes', 'No'])
+if result == 'Yes':
+    dir = last_path
+else:
+    Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
+    # show an "Open" dialog box and return the path to the selected file
+    STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
+    dir = filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
@@ -30,7 +41,6 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
 # ----------------- SCREEN ELEMENTS/SURFACES -----------------
-pygame.init()
 pygame.display.set_caption("QR Code Parser - Mercury 1089")
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
