@@ -7,6 +7,7 @@ import numpy as np
 import pyautogui
 import Processor
 from components.InputBox import InputBox
+from components.Button import Button
 import Utils
 
 QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," + \
@@ -47,7 +48,10 @@ team_num_b1 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 1.5*BOX_HEIGHT -
 team_num_b2 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT)
 team_num_b3 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT + MARGIN, BOX_WIDTH, BOX_HEIGHT)
 
+clear_button = Button(0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.75*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
+
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
+buttons = [clear_button]
 
 #0 Is the built in camera
 cap = cv2.VideoCapture(0)
@@ -119,6 +123,9 @@ while True:
         for box in team_number_boxes:
                 box.handle_event(event)
 
+        for button in buttons:
+            button.handle_event(event)
+
     count_completed = 0
     # Show each box, count if completed
     for box in team_number_boxes:
@@ -141,4 +148,8 @@ while True:
     surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 25))
     surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 25))
     surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 20))
+    # Show buttons
+    for button in buttons:
+        button.update()
+        button.draw(surface)
     pygame.display.flip()
