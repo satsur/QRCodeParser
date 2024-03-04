@@ -16,8 +16,8 @@ ConfigManager.load_config()
 
 # ----------------- CONSTANTS -----------------
 
-QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," + \
-        "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," + \
+QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," \
+        "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," \
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
 
 # Determine if user wants to use the last path or choose a new one:
@@ -30,13 +30,14 @@ else:
     # show an "Open" dialog box and return the path to the selected file
     STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
     dir = filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
+    ConfigManager.get_config()['last_path'] = dir
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 
 TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size font
 NORMAL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22) # normal text size font
-SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 15) # small text size font
+SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 12) # small text size font
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
@@ -135,6 +136,7 @@ while True:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            ConfigManager.write_config()
             pygame.quit()
             exit()
         if event.type == pygame.KEYDOWN:
