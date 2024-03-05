@@ -11,6 +11,8 @@ OUTLINE_WIDTH = 3
 
 class InputBox:
     def __init__(self, x, y, width, height, text='', font = DEFAULT_FONT):
+        self.default_width = width
+        self.default_height = height
         self.background = pygame.Surface((width-2*OUTLINE_WIDTH, height-2*OUTLINE_WIDTH))
         self.rect = pygame.Rect(x, y, width, height)
         self.color = COLOR_INCOMPLETE
@@ -51,7 +53,7 @@ class InputBox:
         self.txt_surface = self.font.render(self.text, True, FONT_COLOR)
             
         # Resize the box if the text is too long.
-        width = max(200, self.txt_surface.get_width()+10)
+        width = max(self.default_width, self.txt_surface.get_width()+10)
         self.rect.w = width
 
     def draw(self, screen):

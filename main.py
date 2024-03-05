@@ -64,14 +64,21 @@ team_num_b3 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT +
 
 clear_button = Button(0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.7*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
 
+edit_string_box = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, 0.8 * SCREEN_HEIGHT, 2*BOX_WIDTH+MARGIN, BOX_HEIGHT)
+edit_button = Button(edit_string_box.rect.x + 0.5*edit_string_box.rect.width, 
+                     edit_string_box.rect.y + edit_string_box.rect.height + 0.5 * BOX_HEIGHT,
+                     BOX_WIDTH,
+                     BOX_HEIGHT,
+                     "Edit!")
+
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
-buttons = [clear_button]
+buttons = [clear_button, edit_button]
 
 # ----------------- VIDEO CAPTURE -----------------
 
-#0 Is the built in camera
+# 0 Is the built in camera
 cap = cv2.VideoCapture(0)
-#Gets fps of your camera    
+# Gets fps of your camera
 fps = cap.get(cv2.CAP_PROP_FPS)
 print("fps:", fps)
 # If your camera can achieve 60 fps
@@ -152,9 +159,12 @@ while True:
                             team_number_boxes[0].active = True
                         break
 
+        # All input box event handlers
         for box in team_number_boxes:
-                box.handle_event(event)
+            box.handle_event(event)
+        edit_string_box.handle_event(event)
 
+        # All button event handlers
         for button in buttons:
             button.handle_event(event)
             if button.active:
@@ -185,6 +195,9 @@ while True:
     surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 25))
     surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 25))
     surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 25))
+    # Display box for editing the last scanned qr string
+    edit_string_box.update()
+    edit_string_box.draw(surface)
     # Show buttons
     for button in buttons:
         button.update()
