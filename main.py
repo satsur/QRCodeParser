@@ -62,17 +62,21 @@ team_num_b1 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 1.5*BOX_HEIGHT -
 team_num_b2 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT)
 team_num_b3 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT + MARGIN, BOX_WIDTH, BOX_HEIGHT)
 
-clear_button = Button(0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.7*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
+clear_button = Button("clear", 0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.7*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
 
 edit_string_box = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, 0.8 * SCREEN_HEIGHT, 2*BOX_WIDTH+MARGIN, BOX_HEIGHT)
-edit_button = Button(edit_string_box.rect.x + 0.5*edit_string_box.rect.width, 
+edit_button = Button("edit", edit_string_box.rect.x + 0.5*edit_string_box.rect.width - BOX_WIDTH, 
                      edit_string_box.rect.y + edit_string_box.rect.height + 0.5 * BOX_HEIGHT,
                      BOX_WIDTH,
                      BOX_HEIGHT,
-                     "Edit!")
+                     "Edit!", 
+                     SMALL_FONT)
 
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
 buttons = [clear_button, edit_button]
+
+def get_file_paths():
+    return [QR_STRINGS_PATH, EVENT_LIST_PATH, SETUP_LIST_PATH]
 
 # ----------------- VIDEO CAPTURE -----------------
 
@@ -122,6 +126,8 @@ while True:
                     Processor.write_to_setup_list(SETUP_LIST_PATH, qr_string)
                     Processor.write_full_str(QR_STRINGS_PATH, qr_string)
                     box.completed = True
+                    # Put string in edit box
+                    edit_string_box.text = qr_string
                 num_in_boxes = True
         if num_in_boxes:
             pyautogui.alert("Successfully scanned code for Team Number " + str(team_number))
@@ -167,10 +173,12 @@ while True:
         # All button event handlers
         for button in buttons:
             button.handle_event(event)
-            if button.active:
+            if button.name == "clear" and button.active:
                 for box in team_number_boxes:
                     box.text = ''
                     box.completed = False
+            if button.name == "edit" and button.active:
+                Processor.replace_last_entry(get_file_paths, edit_string_box.text)
 
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
     count_completed = 0

@@ -8,7 +8,9 @@ COLOR_DEFAULT = pygame.Color((255,150,0))
 DEFAULT_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22)
 
 class Button:
-    def __init__(self, x, y, width, height, text=''):
+    def __init__(self, name:str, x, y, width, height, text='', font = DEFAULT_FONT):
+        # name allows program to distinguish each button from the others
+        self.name = name
         self.x = x
         self.y = y
         self.width = width

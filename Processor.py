@@ -19,6 +19,13 @@ def write_full_str(path:str, full_str:str):
     with open(path, 'a') as file:
         file.write(full_str + "\n")
 
+def replace_last_entry(paths:list, new_str:str):
+    for path in paths:
+        with open(path, 'r') as file:
+            lines = file.readlines()
+        lines = lines[:-1].append(new_str)
+        with open(path, 'w') as write_file:
+            write_file.write(line + '\n' for line in lines)
+
 def get_team_number(full_str:str) -> str:
     return full_str.split(",")[1]
-
