@@ -24,3 +24,6 @@ def write_config():
 # Call as many times as necessary, loads the cached config
 def get_config():
     return config
+
+def set_config(key:str, val):
+    config[key] = val

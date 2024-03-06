@@ -29,13 +29,12 @@ last_path = ConfigManager.get_config()['last_path']
 result = tkinter.messagebox.askquestion(title=APP_NAME, message=f'Would you like to use {last_path} again?')
 if result == tkinter.messagebox.YES:
     dir = last_path
-    Tk().withdraw()
 else:
     Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
     # show an "Open" dialog box and return the path to the selected file
     STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
     dir = tkinter.filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
-    ConfigManager.get_config()['last_path'] = dir
+    ConfigManager.set_config('last_path', dir)
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
@@ -121,21 +120,22 @@ while True:
 
         team_number = Processor.get_team_number(qr_string)
         num_in_boxes = False
+        duplicate_string = False
         for box in team_number_boxes:
             if team_number == box.text.strip():
                 # Do not let the same box be scanned twice
                 if box.completed:
                     tkinter.messagebox.showerror(title=APP_NAME, message="A QR code has already been submitted with this team number.")
+                    duplicate_string = True
                 else:
-                    # Show last scaned string 
                     Processor.write_to_event_list(EVENT_LIST_PATH, qr_string)
                     Processor.write_to_setup_list(SETUP_LIST_PATH, qr_string)
                     Processor.write_full_str(QR_STRINGS_PATH, qr_string)
                     box.completed = True
-                    # 
-                    last_string_text = SMALL_FONT.render(qr_string, True, FONT_COLOR)
+                    # Show last scanned string 
+                    last_string_text = NORMAL_FONT.render(qr_string, True, FONT_COLOR)
                 num_in_boxes = True
-        if num_in_boxes:
+        if num_in_boxes and not duplicate_string:
             tkinter.messagebox.showinfo(title=APP_NAME, message=f"Successfully scanned code for Team Number {team_number}")
         elif not num_in_boxes:
              tkinter.messagebox.showerror(title=APP_NAME, 
