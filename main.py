@@ -66,8 +66,8 @@ team_num_b3 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT +
 clear_button = Button("clear", 0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.7*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
 
 last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
-edit_button = Button("edit", last_string_text.get_bounding_rect().x + 0.5*last_string_text.get_bounding_rect().width - BOX_WIDTH, 
-                     last_string_text.get_bounding_rect().y + last_string_text.get_bounding_rect().height + 0.5 * BOX_HEIGHT,
+edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2, 
+                     0.85*SCREEN_HEIGHT,
                      BOX_WIDTH,
                      BOX_HEIGHT,
                      "Edit!", 
