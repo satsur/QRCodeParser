@@ -2,7 +2,10 @@ import cv2
 from pyzbar.pyzbar import decode
 import pygame
 from tkinter import Tk
-from tkinter import filedialog
+import tkinter
+import tkinter.filedialog
+import tkinter.messagebox
+import tkinter.simpledialog
 import numpy as np
 import pyautogui
 import Processor
@@ -16,20 +19,22 @@ ConfigManager.load_config()
 
 # ----------------- CONSTANTS -----------------
 
+APP_NAME = "QR Code Parser - Mercury 1089"
 QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," \
         "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," \
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
 
 # Determine if user wants to use the last path or choose a new one:
 last_path = ConfigManager.get_config()['last_path']
-result = pyautogui.confirm(text=f'Would you like to use {last_path} again?', title='Mercury 1089 QR Code Parser', buttons=['Yes', 'No'])
-if result == 'Yes':
+result = tkinter.messagebox.askquestion(title=APP_NAME, message=f'Would you like to use {last_path} again?')
+if result == tkinter.messagebox.YES:
     dir = last_path
+    Tk().withdraw()
 else:
     Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
     # show an "Open" dialog box and return the path to the selected file
     STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
-    dir = filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
+    dir = tkinter.filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
     ConfigManager.get_config()['last_path'] = dir
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
@@ -43,7 +48,7 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
 # ----------------- SCREEN ELEMENTS/SURFACES -----------------
-pygame.display.set_caption("QR Code Parser - Mercury 1089")
+pygame.display.set_caption(APP_NAME)
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
@@ -105,7 +110,7 @@ while True:
     # print(decoded_info)
 
     if (len(decoded_info) > 1): # Don't want to scan two QR codes at once
-        pyautogui.alert("Make sure there isn't more than ONE QR Code on screen at once!")
+        tkinter.messagebox.showwarning(title=APP_NAME, message="Make sure there isn't more than ONE QR Code on screen at once!")
 
     # If QR code has been scanned, process and write to file, update boxes as needed
     if (len(decoded_info) > 0):
@@ -120,7 +125,7 @@ while True:
             if team_number == box.text.strip():
                 # Do not let the same box be scanned twice
                 if box.completed:
-                    pyautogui.alert("A QR code has already been submitted with this team number.")
+                    tkinter.messagebox.showerror(title=APP_NAME, message="A QR code has already been submitted with this team number.")
                 else:
                     # Show last scaned string 
                     Processor.write_to_event_list(EVENT_LIST_PATH, qr_string)
@@ -131,9 +136,10 @@ while True:
                     last_string_text = SMALL_FONT.render(qr_string, True, FONT_COLOR)
                 num_in_boxes = True
         if num_in_boxes:
-            pyautogui.alert("Successfully scanned code for Team Number " + str(team_number))
+            tkinter.messagebox.showinfo(title=APP_NAME, message=f"Successfully scanned code for Team Number {team_number}")
         elif not num_in_boxes:
-             pyautogui.alert("Team number does not match up to list. Make sure the boxes and QR code have the right information.")
+             tkinter.messagebox.showerror(title=APP_NAME, 
+                                          message="Team number does not match up to list. Make sure the boxes and QR code have the right information.")
 
     # ----------------- CREATING WEBCAM SURFACE -----------------
              
@@ -178,8 +184,7 @@ while True:
                     box.text = ''
                     box.completed = False
             if button.name == "edit" and button.active:
-                print('buttno is active!!')
-                edit_prompt = pyautogui.prompt(text='Edit the string and click OK.', title='Edit QR String', default=qr_string)
+                edit_prompt = tkinter.simpledialog.askstring(title=APP_NAME, prompt='Edit the string and click OK.', initialvalue=qr_string)
                 if edit_prompt != None:
                     Processor.replace_last_entry(get_file_paths(), edit_prompt)
                     button.active = False
