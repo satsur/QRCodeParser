@@ -21,11 +21,22 @@ def write_full_str(path:str, full_str:str):
 
 def replace_last_entry(paths:list, new_str:str):
     for path in paths:
-        with open(path, 'r') as file:
+        with open(path, 'r+') as file:
+            print(path)
             lines = file.readlines()
-        lines = lines[:-1].append(new_str)
-        with open(path, 'w') as write_file:
-            write_file.write(line + '\n' for line in lines)
+            print("oldlines: " + str(lines))
+            # Make sure not to delete the headers
+            if len(lines) > 1:
+                lines = lines[:-1]
+            file.seek(0)
+            file.truncate()
+            print("newlines: " + str(lines))
+            for line in lines:
+                file.write(line)
+    # 0: qrStrings, 1: eventList, 2: setupList
+    write_full_str(paths[0], new_str)
+    write_to_event_list(paths[1], new_str)
+    write_to_setup_list(paths[2], new_str)
 
 def get_team_number(full_str:str) -> str:
     return full_str.split(",")[1]

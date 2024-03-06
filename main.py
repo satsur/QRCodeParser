@@ -38,6 +38,7 @@ QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size font
 NORMAL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22) # normal text size font
 SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 12) # small text size font
+FONT_COLOR = pygame.Color((255,150,0))
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
@@ -47,9 +48,9 @@ surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
 
-setup_list_surf = SMALL_FONT.render(f"SETUP LIST: {SETUP_LIST_PATH}", True, pygame.Color((255,150,0)))
-event_list_surf = SMALL_FONT.render(f"EVENT LIST: {EVENT_LIST_PATH}", True, pygame.Color((255,150,0))) # Orange (255,150,0)
-qr_strings_surf = SMALL_FONT.render(f"QR STRINGS: {QR_STRINGS_PATH}", True, pygame.Color((255,150,0)))
+setup_list_surf = SMALL_FONT.render(f"SETUP LIST: {SETUP_LIST_PATH}", True, FONT_COLOR)
+event_list_surf = SMALL_FONT.render(f"EVENT LIST: {EVENT_LIST_PATH}", True, FONT_COLOR) # Orange (255,150,0)
+qr_strings_surf = SMALL_FONT.render(f"QR STRINGS: {QR_STRINGS_PATH}", True, FONT_COLOR)
 
 # 10 pixel margins between each box (vertically and horizontally)
 BOX_WIDTH = 200
@@ -64,9 +65,9 @@ team_num_b3 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT +
 
 clear_button = Button("clear", 0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.7*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
 
-edit_string_box = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, 0.8 * SCREEN_HEIGHT, 2*BOX_WIDTH+MARGIN, BOX_HEIGHT)
-edit_button = Button("edit", edit_string_box.rect.x + 0.5*edit_string_box.rect.width - BOX_WIDTH, 
-                     edit_string_box.rect.y + edit_string_box.rect.height + 0.5 * BOX_HEIGHT,
+last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
+edit_button = Button("edit", last_string_text.get_bounding_rect().x + 0.5*last_string_text.get_bounding_rect().width - BOX_WIDTH, 
+                     last_string_text.get_bounding_rect().y + last_string_text.get_bounding_rect().height + 0.5 * BOX_HEIGHT,
                      BOX_WIDTH,
                      BOX_HEIGHT,
                      "Edit!", 
@@ -121,13 +122,13 @@ while True:
                 if box.completed:
                     pyautogui.alert("A QR code has already been submitted with this team number.")
                 else:
-                    # Write strings to respective lists
+                    # Show last scaned string 
                     Processor.write_to_event_list(EVENT_LIST_PATH, qr_string)
                     Processor.write_to_setup_list(SETUP_LIST_PATH, qr_string)
                     Processor.write_full_str(QR_STRINGS_PATH, qr_string)
                     box.completed = True
-                    # Put string in edit box
-                    edit_string_box.text = qr_string
+                    # 
+                    last_string_text = SMALL_FONT.render(qr_string, True, FONT_COLOR)
                 num_in_boxes = True
         if num_in_boxes:
             pyautogui.alert("Successfully scanned code for Team Number " + str(team_number))
@@ -143,7 +144,7 @@ while True:
     # The capture uses BGR colors and PyGame needs RGB
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    surf = pygame.surfarray.make_surface(frame)
+    webcam_surf = pygame.surfarray.make_surface(frame)
 
     # ----------------- EVENT LISTENERS -----------------
 
@@ -168,7 +169,6 @@ while True:
         # All input box event handlers
         for box in team_number_boxes:
             box.handle_event(event)
-        edit_string_box.handle_event(event)
 
         # All button event handlers
         for button in buttons:
@@ -178,8 +178,11 @@ while True:
                     box.text = ''
                     box.completed = False
             if button.name == "edit" and button.active:
-                Processor.replace_last_entry(get_file_paths, edit_string_box.text)
-
+                print('buttno is active!!')
+                edit_prompt = pyautogui.prompt(text='Edit the string and click OK.', title='Edit QR String', default=qr_string)
+                if edit_prompt != None:
+                    Processor.replace_last_entry(get_file_paths(), edit_prompt)
+                    button.active = False
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
     count_completed = 0
     # Show each box, count if completed
@@ -195,7 +198,7 @@ while True:
             box.completed = False
 
     # Show the webcam capture surface!
-    surface.blit(surf, (20 , SCREEN_HEIGHT / 2 - surf.get_height() / 2))
+    surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
@@ -204,8 +207,7 @@ while True:
     surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 25))
     surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 25))
     # Display box for editing the last scanned qr string
-    edit_string_box.update()
-    edit_string_box.draw(surface)
+    surface.blit(last_string_text, (0.75 * SCREEN_WIDTH - last_string_text.get_width()/2, 0.8 * SCREEN_HEIGHT))
     # Show buttons
     for button in buttons:
         button.update()
