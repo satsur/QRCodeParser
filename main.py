@@ -62,7 +62,7 @@ BOX_HEIGHT = 50
 MARGIN = 10
 
 match_num_text = NORMAL_FONT.render("Match: ", True, pygame.Color("white"))
-match_num_box = InputBox(0.75*SCREEN_WIDTH, SCREEN_HEIGHT/4, BOX_WIDTH/2, BOX_HEIGHT, completable=False)
+match_num_input_box = InputBox(0.75*SCREEN_WIDTH, SCREEN_HEIGHT/4, BOX_WIDTH/2, BOX_HEIGHT, completable=False)
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
 team_num_r1 = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, SCREEN_HEIGHT / 2 - 1.5 * BOX_HEIGHT - MARGIN, BOX_WIDTH, BOX_HEIGHT)
 team_num_r2 = InputBox(team_num_r1.rect.x, team_num_r1.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT)
@@ -83,7 +83,7 @@ edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2,
                      SMALL_FONT)
 
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
-input_boxes = team_number_boxes + [match_num_box]
+input_boxes = team_number_boxes + [match_num_input_box]
 buttons = [clear_button, edit_button]
 
 def get_file_paths():
@@ -101,6 +101,8 @@ print("fps:", fps)
 cap.set(cv2.CAP_PROP_FPS, 60)
 
 # ----------------- GAME LOOP -----------------
+match_number = 1
+
 while True:
     surface.fill(APP_BG_COLOR)
 
@@ -202,8 +204,11 @@ while True:
             count_completed += 1
         box.update()
         box.draw(surface)
-    match_num_box.update()
-    match_num_box.draw(surface)
+    match_num_input_box.update()
+    match_num_input_box.draw(surface)
+    match_number = match_num_input_box.text
+    if match_num_input_box.text.strip() != str(match_number):
+        match_number = match_num_input_box.text
 
     if count_completed == len(team_number_boxes):
         for box in team_number_boxes:
@@ -214,7 +219,7 @@ while True:
     surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
-    surface.blit(match_num_text, (match_num_box.rect.x - match_num_text.get_width(), match_num_box.rect.y + match_num_box.rect.height/2))
+    surface.blit(match_num_text, (match_num_input_box.rect.x - match_num_text.get_width(), match_num_input_box.rect.y + match_num_input_box.rect.height/2))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
     # Display file paths in bottom left
     surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 25))
