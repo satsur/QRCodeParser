@@ -3,3 +3,4 @@
 /QRCodeParser/qrStrings.txt
 *.pyc
 config.yml
+.env

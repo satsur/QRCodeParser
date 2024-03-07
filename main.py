@@ -23,6 +23,7 @@ APP_NAME = "QR Code Parser - Mercury 1089"
 QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," \
         "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," \
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
+APP_BG_COLOR = pygame.Color((51,51,51))
 
 # Determine if user wants to use the last path or choose a new one:
 last_path = ConfigManager.get_config()['last_path']
@@ -50,7 +51,6 @@ SCREEN_HEIGHT = 720
 pygame.display.set_caption(APP_NAME)
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
-box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
 
 setup_list_surf = SMALL_FONT.render(f"SETUP LIST: {SETUP_LIST_PATH}", True, FONT_COLOR)
 event_list_surf = SMALL_FONT.render(f"EVENT LIST: {EVENT_LIST_PATH}", True, FONT_COLOR) # Orange (255,150,0)
@@ -60,24 +60,30 @@ qr_strings_surf = SMALL_FONT.render(f"QR STRINGS: {QR_STRINGS_PATH}", True, FONT
 BOX_WIDTH = 200
 BOX_HEIGHT = 50
 MARGIN = 10
-team_num_r1 = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, SCREEN_HEIGHT / 2 - 1.5 * BOX_HEIGHT - MARGIN, BOX_WIDTH, BOX_HEIGHT)
-team_num_r2 = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, SCREEN_HEIGHT / 2 - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT)
-team_num_r3 = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT + MARGIN, BOX_WIDTH, BOX_HEIGHT)
-team_num_b1 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 1.5*BOX_HEIGHT - MARGIN, BOX_WIDTH, BOX_HEIGHT)
-team_num_b2 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT)
-team_num_b3 = InputBox(0.75 * SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 0.5*BOX_HEIGHT + MARGIN, BOX_WIDTH, BOX_HEIGHT)
 
-clear_button = Button("clear", 0.75*SCREEN_WIDTH - 0.5*BOX_WIDTH, 0.7*SCREEN_HEIGHT - 0.5*BOX_HEIGHT, BOX_WIDTH, BOX_HEIGHT, "Clear")
+match_num_text = NORMAL_FONT.render("Match: ", True, pygame.Color("white"))
+match_num_box = InputBox(0.75*SCREEN_WIDTH, SCREEN_HEIGHT/4, BOX_WIDTH/2, BOX_HEIGHT, completable=False)
+box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
+team_num_r1 = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, SCREEN_HEIGHT / 2 - 1.5 * BOX_HEIGHT - MARGIN, BOX_WIDTH, BOX_HEIGHT)
+team_num_r2 = InputBox(team_num_r1.rect.x, team_num_r1.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT)
+team_num_r3 = InputBox(team_num_r1.rect.x, team_num_r2.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT)
+team_num_b1 = InputBox(team_num_r1.rect.x + BOX_WIDTH+MARGIN, team_num_r1.rect.y, BOX_WIDTH, BOX_HEIGHT)
+team_num_b2 = InputBox(team_num_b1.rect.x, team_num_r2.rect.y, BOX_WIDTH, BOX_HEIGHT)
+team_num_b3 = InputBox(team_num_b1.rect.x, team_num_r3.rect.y, BOX_WIDTH, BOX_HEIGHT)
+
+clear_button = Button("clear", team_num_r1.rect.x, team_num_r3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Clear")
+load_teams = Button("load", team_num_b1.rect.x, team_num_b3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Load Teams")
 
 last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
 edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2, 
-                     0.85*SCREEN_HEIGHT,
+                     0.80*SCREEN_HEIGHT,
                      BOX_WIDTH,
                      BOX_HEIGHT,
                      "Edit!", 
                      SMALL_FONT)
 
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
+input_boxes = team_number_boxes + [match_num_box]
 buttons = [clear_button, edit_button]
 
 def get_file_paths():
@@ -95,9 +101,8 @@ print("fps:", fps)
 cap.set(cv2.CAP_PROP_FPS, 60)
 
 # ----------------- GAME LOOP -----------------
-
 while True:
-    surface.fill([51,51,51])
+    surface.fill(APP_BG_COLOR)
 
     # Get frame from video
     success, frame = cap.read()
@@ -173,7 +178,7 @@ while True:
                         break
 
         # All input box event handlers
-        for box in team_number_boxes:
+        for box in input_boxes:
             box.handle_event(event)
 
         # All button event handlers
@@ -189,6 +194,7 @@ while True:
                     Processor.replace_last_entry(get_file_paths(), edit_prompt)
                     button.active = False
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
+    
     count_completed = 0
     # Show each box, count if completed
     for box in team_number_boxes:
@@ -196,6 +202,8 @@ while True:
             count_completed += 1
         box.update()
         box.draw(surface)
+    match_num_box.update()
+    match_num_box.draw(surface)
 
     if count_completed == len(team_number_boxes):
         for box in team_number_boxes:
@@ -206,13 +214,14 @@ while True:
     surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
+    surface.blit(match_num_text, (match_num_box.rect.x - match_num_text.get_width(), match_num_box.rect.y + match_num_box.rect.height/2))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
     # Display file paths in bottom left
     surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 25))
     surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 25))
     surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 25))
     # Display box for editing the last scanned qr string
-    surface.blit(last_string_text, (0.75 * SCREEN_WIDTH - last_string_text.get_width()/2, 0.8 * SCREEN_HEIGHT))
+    surface.blit(last_string_text, (0.75 * SCREEN_WIDTH - last_string_text.get_width()/2, clear_button.rect.y + 1.5*BOX_HEIGHT))
     # Show buttons
     for button in buttons:
         button.update()

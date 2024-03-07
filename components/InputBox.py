@@ -7,14 +7,17 @@ COLOR_ACTIVE = pygame.Color('dodgerblue2')
 COLOR_COMPLETED = pygame.Color((0, 255, 0))
 DEFAULT_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22)
 FONT_COLOR = pygame.Color("black")
+BG_COLOR = pygame.Color("white")
+ALT_OUTLINE_COLOR = pygame.Color("black")
 OUTLINE_WIDTH = 3
 
 class InputBox:
-    def __init__(self, x, y, width, height, text='', font = DEFAULT_FONT):
+    def __init__(self, x, y, width, height, text='', completable=True, font = DEFAULT_FONT):
         self.default_width = width
         self.default_height = height
         self.background = pygame.Surface((width-2*OUTLINE_WIDTH, height-2*OUTLINE_WIDTH))
         self.rect = pygame.Rect(x, y, width, height)
+        self.completable = completable
         self.color = COLOR_INCOMPLETE
         self.text = text
         self.font = font
@@ -44,6 +47,8 @@ class InputBox:
         # Change the current color of the input box.
         if self.active:
             self.color = COLOR_ACTIVE
+        elif not self.completable:
+            self.color = ALT_OUTLINE_COLOR
         elif not self.active and self.completed:
             self.color = COLOR_COMPLETED
         else:
@@ -58,7 +63,7 @@ class InputBox:
 
     def draw(self, screen):
         # Set input box background
-        self.background.fill((255,255,255))
+        self.background.fill(BG_COLOR)
         screen.blit(self.background, (self.rect.x + OUTLINE_WIDTH, self.rect.y + OUTLINE_WIDTH))
         # Blit rectangle (outline) onto input box
         pygame.draw.rect(screen, self.color, self.rect, OUTLINE_WIDTH)
