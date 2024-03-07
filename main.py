@@ -13,6 +13,7 @@ from components.InputBox import InputBox
 from components.Button import Button
 import Utils
 import ConfigManager
+import api.RequestHandler as RequestHandler
 
 pygame.init()
 ConfigManager.load_config()
@@ -72,7 +73,7 @@ team_num_b2 = InputBox(team_num_b1.rect.x, team_num_r2.rect.y, BOX_WIDTH, BOX_HE
 team_num_b3 = InputBox(team_num_b1.rect.x, team_num_r3.rect.y, BOX_WIDTH, BOX_HEIGHT)
 
 clear_button = Button("clear", team_num_r1.rect.x, team_num_r3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Clear")
-load_teams = Button("load", team_num_b1.rect.x, team_num_b3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Load Teams")
+load_teams_button = Button("load", team_num_b1.rect.x, team_num_b3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Load Teams")
 
 last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
 edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2, 
@@ -84,7 +85,7 @@ edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2,
 
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
 input_boxes = team_number_boxes + [match_num_input_box]
-buttons = [clear_button, edit_button]
+buttons = [clear_button, edit_button, load_teams_button]
 
 def get_file_paths():
     return [QR_STRINGS_PATH, EVENT_LIST_PATH, SETUP_LIST_PATH]
@@ -187,6 +188,7 @@ while True:
         for button in buttons:
             button.handle_event(event)
             if button.name == "clear" and button.active:
+                button.active = False
                 for box in team_number_boxes:
                     box.text = ''
                     box.completed = False
@@ -195,6 +197,24 @@ while True:
                 if edit_prompt != None:
                     Processor.replace_last_entry(get_file_paths(), edit_prompt)
                     button.active = False
+            if button.name == "load" and button.active:
+                button.active = False
+                event_key = ConfigManager.get_config()["event_key"]
+                if event_key == None:
+                    event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+                event_data = RequestHandler.get_event_matches(event_key)
+                if event_data == None:
+                    break
+                teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
+                if teams_in_match == None:
+                    break
+                for i in range(len(team_number_boxes)):
+                    if i < 3:
+                        team_number_boxes[i].text = teams_in_match["red"][i]
+                    else:
+                        team_number_boxes[i].text = teams_in_match["blue"][i-3]
+                ConfigManager.set_config("event_key", event_key)
+                                    
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
     
     count_completed = 0
