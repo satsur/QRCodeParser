@@ -1,6 +1,5 @@
-/QRCodeParser/setupList.csv
-/QRCodeParser/eventList.csv
-/QRCodeParser/qrStrings.txt
-*.pyc
+.csv
+.txt
+.pyc
 config.yml
 .env
