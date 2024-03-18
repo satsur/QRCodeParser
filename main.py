@@ -81,7 +81,10 @@ team_num_b2 = InputBox(team_num_b1.rect.x, team_num_r2.rect.y, BOX_WIDTH, BOX_HE
 team_num_b3 = InputBox(team_num_b1.rect.x, team_num_r3.rect.y, BOX_WIDTH, BOX_HEIGHT)
 
 clear_button = Button("clear", team_num_r1.rect.x, team_num_r3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Clear")
-load_teams_button = Button("load", team_num_b1.rect.x, team_num_b3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Load Teams")
+# GET TEAMS fills in team data from the STORED match data
+get_teams_button = Button("get_teams", team_num_b1.rect.x, team_num_b3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Get Teams")
+# LOAD TEAMS fetches event match data from TheBlueAlliance API and stores in locally
+load_teams_button = Button("load_teams", 10, 10, BOX_WIDTH, BOX_HEIGHT, "Load Teams")
 
 last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
 edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2, 
@@ -94,7 +97,7 @@ edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2,
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
 input_boxes = team_number_boxes + [match_num_input_box]
 # Reminder to add edit_button and load_teams_button back, removed it for competition because of bugs
-buttons = [clear_button, edit_button, load_teams_button]
+buttons = [clear_button, edit_button, load_teams_button, get_teams_button]
 
 # ----------------- VIDEO CAPTURE -----------------
 
@@ -120,7 +123,7 @@ while True:
  
     # Process Frame - Detect and decode QR Code from frame
     decoded_info = decode(frame)
-    # print(decoded_info)
+    print(decoded_info)
 
     if (len(decoded_info) > 1): # Don't want to scan two QR codes at once
         tkinter.messagebox.showwarning(title=APP_NAME, message="Make sure there isn't more than ONE QR Code on screen at once!")
@@ -193,23 +196,43 @@ while True:
         # All button event handlers
         for button in buttons:
             button.handle_event(event)
+            # CLEAR BUTTON
             if button.name == "clear" and button.active:
                 button.active = False
                 for box in team_number_boxes:
                     box.text = ''
                     box.completed = False
+            # EDIT BUTTON
             if button.name == "edit" and button.active:
                 edit_prompt = tkinter.simpledialog.askstring(title=APP_NAME, prompt='Edit the string and click OK.', initialvalue=qr_string)
                 if edit_prompt != None:
-                    Processor.replace_last_entry(get_file_paths(), edit_prompt)
+                    Processor.replace_last_entry(edit_prompt)
                     button.active = False
-            if button.name == "load" and button.active:
+            if button.name == "load_teams" and button.active:
                 button.active = False
                 event_key = ConfigManager.get_config()["event_key"]
                 if event_key == None:
                     event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
-                event_data = RequestHandler.get_event_matches(event_key)
-                if event_data == None:
+                else:
+                    yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
+                    if yesno == False:
+                        event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+                match_data = RequestHandler.load_match_data_from_api(event_key)
+                RequestHandler.store_matches(match_data)
+                tkinter.messagebox.showinfo(f"Data for event {event_key} has been fetched and stored.")
+            # GET TEAMS BUTTON
+            if button.name == "get_teams" and button.active:
+                button.active = False
+                event_key = ConfigManager.get_config()["event_key"]
+                if event_key == None:
+                    event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+                else:
+                    yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
+                    if yesno == False:
+                        event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+                event_data = RequestHandler.get_stored_match_data(event_key)
+                if event_data is None:
+                    tkinter.messagebox.askokcancel(title=APP_NAME, message=f"Data for event {event_key} has not been stored.")
                     break
                 teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
                 if teams_in_match == None:
