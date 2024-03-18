@@ -43,9 +43,7 @@ QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 # Add paths to config
 if SETUP_LIST_PATH != None and EVENT_LIST_PATH != None and QR_STRINGS_PATH != None:
     ConfigManager.set_config('last_path', dir)
-    ConfigManager.set_config("qr_strings_path", QR_STRINGS_PATH)
-    ConfigManager.set_config("event_list_path", EVENT_LIST_PATH)
-    ConfigManager.set_config("setup_list_path", SETUP_LIST_PATH)
+    ConfigManager.set_config("paths", {"qr_strings": QR_STRINGS_PATH, "event_list": EVENT_LIST_PATH, "setup_list": SETUP_LIST_PATH})
 else:
     tkinter.messagebox.askokcancel(title=APP_NAME, message="Please select a directory that contains the necessary files (eventList.csv, setupList.csv, qrStrings.txt).")
     pygame.quit()
@@ -97,9 +95,6 @@ team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_nu
 input_boxes = team_number_boxes + [match_num_input_box]
 # Reminder to add edit_button and load_teams_button back, removed it for competition because of bugs
 buttons = [clear_button, edit_button, load_teams_button]
-
-def get_file_paths():
-    return [QR_STRINGS_PATH, EVENT_LIST_PATH, SETUP_LIST_PATH]
 
 # ----------------- VIDEO CAPTURE -----------------
 

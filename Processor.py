@@ -1,8 +1,14 @@
+import ConfigManager
+
 # Strip comma from end if necessary
 def strip_commas(full_str:str) -> str:
     while full_str[-1] == ",":
         full_str = full_str[:-1]
     return full_str
+
+# Get file paths from config
+def get_file_paths():
+    return [val for key,val in ConfigManager.get_config("paths")]
 
 # Writes setup portion of qr string to setupList.csv
 def write_to_setup_list(path:str, full_str:str):
@@ -27,7 +33,8 @@ def write_full_str(path:str, full_str:str):
     with open(path, 'a') as file:
         file.write(strip_commas(full_str) + "\n")
 
-def replace_last_entry(paths:list, new_str:str):
+def replace_last_entry(new_str:str):
+    paths = get_file_paths()
     for path in paths:
         with open(path, 'r+') as file:
             print(path)
