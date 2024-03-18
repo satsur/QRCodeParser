@@ -18,9 +18,12 @@ headers = {
     "X-TBA-Auth-Key": API_KEY
 }
 
-def schedule_exists(key:str):
+def get_stored_event_key():
     with open(DATA_FILE, 'r') as file:
-        return json.load(file)["event_key"] == key
+        return json.load(file)["event_key"]
+
+def schedule_exists(key:str):
+    return get_stored_event_key() == key
 
 def store_matches(match_data):
     stored_match_data = {}

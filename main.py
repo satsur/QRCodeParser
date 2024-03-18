@@ -123,7 +123,7 @@ while True:
  
     # Process Frame - Detect and decode QR Code from frame
     decoded_info = decode(frame)
-    print(decoded_info)
+    # print(decoded_info)
 
     if (len(decoded_info) > 1): # Don't want to scan two QR codes at once
         tkinter.messagebox.showwarning(title=APP_NAME, message="Make sure there isn't more than ONE QR Code on screen at once!")
@@ -202,6 +202,7 @@ while True:
                 for box in team_number_boxes:
                     box.text = ''
                     box.completed = False
+
             # EDIT BUTTON
             if button.name == "edit" and button.active:
                 edit_prompt = tkinter.simpledialog.askstring(title=APP_NAME, prompt='Edit the string and click OK.', initialvalue=qr_string)
@@ -217,19 +218,15 @@ while True:
                     yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
                     if yesno == False:
                         event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+                ConfigManager.set_config("event_key", event_key)
                 match_data = RequestHandler.load_match_data_from_api(event_key)
                 RequestHandler.store_matches(match_data)
-                tkinter.messagebox.showinfo(f"Data for event {event_key} has been fetched and stored.")
+                tkinter.messagebox.showinfo(title=APP_NAME, message=f"Data for event {event_key} has been fetched and stored.")
+
             # GET TEAMS BUTTON
             if button.name == "get_teams" and button.active:
                 button.active = False
                 event_key = ConfigManager.get_config()["event_key"]
-                if event_key == None:
-                    event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
-                else:
-                    yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
-                    if yesno == False:
-                        event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
                 event_data = RequestHandler.get_stored_match_data(event_key)
                 if event_data is None:
                     tkinter.messagebox.askokcancel(title=APP_NAME, message=f"Data for event {event_key} has not been stored.")
