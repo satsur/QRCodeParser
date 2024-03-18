@@ -36,11 +36,21 @@ else:
     # show an "Open" dialog box and return the path to the selected file
     STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
     dir = tkinter.filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
-    ConfigManager.set_config('last_path', dir)
 SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
 EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 
+# Add paths to config
+if SETUP_LIST_PATH != None and EVENT_LIST_PATH != None and QR_STRINGS_PATH != None:
+    ConfigManager.set_config('last_path', dir)
+    ConfigManager.set_config("qr_strings_path", QR_STRINGS_PATH)
+    ConfigManager.set_config("event_list_path", EVENT_LIST_PATH)
+    ConfigManager.set_config("setup_list_path", SETUP_LIST_PATH)
+else:
+    tkinter.messagebox.askokcancel(title=APP_NAME, message="Please select a directory that contains the necessary files (eventList.csv, setupList.csv, qrStrings.txt).")
+    pygame.quit()
+    exit()
+    
 TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size font
 NORMAL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22) # normal text size font
 SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 12) # small text size font
@@ -85,6 +95,7 @@ edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2,
 
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
 input_boxes = team_number_boxes + [match_num_input_box]
+# Reminder to add edit_button and load_teams_button back, removed it for competition because of bugs
 buttons = [clear_button, edit_button, load_teams_button]
 
 def get_file_paths():
@@ -242,11 +253,11 @@ while True:
     surface.blit(match_num_text, (match_num_input_box.rect.x - match_num_text.get_width(), match_num_input_box.rect.y + match_num_input_box.rect.height/2))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
     # Display file paths in bottom left
-    surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 25))
-    surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 25))
-    surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 25))
+    surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 10))
+    surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 10))
+    surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 10))
     # Display box for editing the last scanned qr string
-    surface.blit(last_string_text, (0.75 * SCREEN_WIDTH - last_string_text.get_width()/2, clear_button.rect.y + 1.5*BOX_HEIGHT))
+    surface.blit(last_string_text, (0.5 * SCREEN_WIDTH - last_string_text.get_width()/2, 0.85 * SCREEN_HEIGHT + 10))
     # Show buttons
     for button in buttons:
         button.update()
