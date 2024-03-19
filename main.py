@@ -14,6 +14,7 @@ from components.Button import Button
 import Utils
 import ConfigManager
 import api.RequestHandler as RequestHandler
+import time
 
 pygame.init()
 ConfigManager.load_config()
@@ -112,6 +113,7 @@ cap.set(cv2.CAP_PROP_FPS, 60)
 
 # ----------------- GAME LOOP -----------------
 match_number = 1
+last_scan_time = 0
 
 while True:
     surface.fill(APP_BG_COLOR)
@@ -130,6 +132,11 @@ while True:
 
     # If QR code has been scanned, process and write to file, update boxes as needed
     if (len(decoded_info) > 0):
+        now = time.time()
+        if now - last_scan_time > 1:
+            last_scan_time = now
+        else:
+            continue
         # print("Decoded info: " + str(decoded_info))
         # data is type "bytes" by default, use decode("utf-8") to convert to string
         qr_string = decoded_info[0].data.decode("utf-8")

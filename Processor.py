@@ -13,9 +13,7 @@ def get_file_paths():
 # Writes setup portion of qr string to setupList.csv
 def write_to_setup_list(path:str, full_str:str):
     str_arr = strip_commas(full_str).split(",")
-    print(str_arr)
     str_arr = str_arr[:str_arr.index("Auton")]
-    print(str_arr)
     setup_str = ",".join([data for data in str_arr])
     with open(path, 'a') as file:
         file.write(setup_str + "\n")
