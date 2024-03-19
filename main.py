@@ -132,8 +132,9 @@ while True:
 
     # If QR code has been scanned, process and write to file, update boxes as needed
     if (len(decoded_info) > 0):
+        # 2 second cooldown between scans to hopefully prevent freezing/crashing
         now = time.time()
-        if now - last_scan_time > 1:
+        if now - last_scan_time > 2:
             last_scan_time = now
         else:
             continue
