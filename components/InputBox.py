@@ -1,4 +1,5 @@
 import pygame
+import Utils
 
 pygame.font.init()
 
@@ -38,7 +39,7 @@ class InputBox:
             if self.active:
                 if event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
-                else:
+                elif Utils.char_is_digit(event.unicode):
                     self.text += event.unicode
                 # Re-render the text.
                 self.txt_surface = self.font.render(self.text, True, FONT_COLOR)

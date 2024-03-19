@@ -1,5 +1,7 @@
 import os
 
+DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
 def find_files(filename, search_path):
    result = []
 
@@ -11,3 +13,7 @@ def find_files(filename, search_path):
       return result[0]
    else:
       return None
+   
+
+def char_is_digit(str_num):
+   return str_num in DIGITS

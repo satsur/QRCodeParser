@@ -70,7 +70,7 @@ BOX_WIDTH = 200
 BOX_HEIGHT = 50
 MARGIN = 10
 
-match_num_text = NORMAL_FONT.render("Match: ", True, pygame.Color("white"))
+match_num_text_surf = NORMAL_FONT.render("Match: ", True, pygame.Color("white"))
 match_num_input_box = InputBox(0.75*SCREEN_WIDTH, SCREEN_HEIGHT/4, BOX_WIDTH/2, BOX_HEIGHT, completable=False)
 box_instructions_surf = NORMAL_FONT.render("Enter team numbers here:", True, pygame.Color("white"))
 team_num_r1 = InputBox(0.75 * SCREEN_WIDTH - BOX_WIDTH - MARGIN, SCREEN_HEIGHT / 2 - 1.5 * BOX_HEIGHT - MARGIN, BOX_WIDTH, BOX_HEIGHT)
@@ -172,11 +172,13 @@ while True:
     # ----------------- EVENT LISTENERS -----------------
 
     for event in pygame.event.get():
+        # Window close
         if event.type == pygame.QUIT:
             ConfigManager.write_config()
             pygame.quit()
             exit()
         if event.type == pygame.KEYDOWN:
+            # press TAB or ENTER
             if event.key == pygame.K_TAB or event.key == pygame.K_RETURN:
                 for i in range(len(team_number_boxes)):
                     if team_number_boxes[i].active:
@@ -189,13 +191,14 @@ while True:
                             team_number_boxes[0].active = True
                         break
 
-        # All input box event handlers
+        # All input box event handlers (typing)
         for box in input_boxes:
             box.handle_event(event)
 
-        # All button event handlers
+        # All button event handlers (click, hover, etc.)
         for button in buttons:
             button.handle_event(event)
+            
             # CLEAR BUTTON
             if button.name == "clear" and button.active:
                 button.active = False
@@ -233,6 +236,7 @@ while True:
                     break
                 teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
                 if teams_in_match == None:
+                    tkinter.messagebox.showerror(title=APP_NAME, message="No teams exist for that match.")
                     break
                 for i in range(len(team_number_boxes)):
                     if i < 3:
@@ -252,9 +256,10 @@ while True:
         box.draw(surface)
     match_num_input_box.update()
     match_num_input_box.draw(surface)
-    match_number = match_num_input_box.text
-    if match_num_input_box.text.strip() != str(match_number):
-        match_number = match_num_input_box.text
+    match_num_text = match_num_input_box.text.strip()
+    match_number = int(match_num_text) if match_num_text != "" else 0
+    if match_num_text != str(match_number):
+        match_number = int(match_num_text) if match_num_text != "" else 0
 
     if count_completed == len(team_number_boxes):
         for box in team_number_boxes:
@@ -265,7 +270,7 @@ while True:
     surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
-    surface.blit(match_num_text, (match_num_input_box.rect.x - match_num_text.get_width(), match_num_input_box.rect.y + match_num_input_box.rect.height/2))
+    surface.blit(match_num_text_surf, (match_num_input_box.rect.x - match_num_text_surf.get_width(), match_num_input_box.rect.y + match_num_input_box.rect.height/2))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
     # Display file paths in bottom left
     surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 10))

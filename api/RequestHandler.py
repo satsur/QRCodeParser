@@ -65,7 +65,10 @@ def compose_match_lookup_key(event_key:str, type: MatchTypes=MatchTypes.QUALIFIC
 
 def get_teams_in_match(match_data, match_num:int, match_type: MatchTypes):
     event_key = match_data["event_key"]
-    match = match_data[compose_match_lookup_key(event_key=event_key, type=match_type, match_number=match_num)]
+    try:
+        match = match_data[compose_match_lookup_key(event_key=event_key, type=match_type, match_number=match_num)]
+    except KeyError:
+        return None
     return {
         "red": [team.replace("frc", "") for team in match["alliances"]["red"]["team_keys"]],
         "blue": [team.replace("frc", "") for team in match["alliances"]["blue"]["team_keys"]]
