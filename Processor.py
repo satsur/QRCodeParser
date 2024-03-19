@@ -55,3 +55,6 @@ def replace_last_entry(new_str:str):
 
 def get_team_number(full_str:str) -> str:
     return full_str.split(",")[1]
+
+def get_match_number(full_str:str) -> str:
+    return full_str.split(",")[2]

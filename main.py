@@ -135,11 +135,12 @@ while True:
         qr_string = decoded_info[0].data.decode("utf-8")
         # print("QR String: " + qr_string)
 
-        team_number = Processor.get_team_number(qr_string)
+        qr_string_team_number = Processor.get_team_number(qr_string)
+        qr_string_match_num = Processor.get_match_number(qr_string)
         num_in_boxes = False
         duplicate_string = False
         for box in team_number_boxes:
-            if team_number == box.text.strip():
+            if qr_string_team_number == box.text.strip() and qr_string_match_num == str(match_number):
                 # Do not let the same box be scanned twice
                 if box.completed:
                     tkinter.messagebox.showerror(title=APP_NAME, message="A QR code has already been submitted with this team number.")
@@ -153,10 +154,10 @@ while True:
                     last_string_text = NORMAL_FONT.render(qr_string, True, FONT_COLOR)
                 num_in_boxes = True
         if num_in_boxes and not duplicate_string:
-            tkinter.messagebox.showinfo(title=APP_NAME, message=f"Successfully scanned code for Team Number {team_number}")
+            tkinter.messagebox.showinfo(title=APP_NAME, message=f"Successfully scanned code for Team Number {qr_string_team_number}")
         elif not num_in_boxes:
              tkinter.messagebox.showerror(title=APP_NAME, 
-                                          message="Team number does not match up to list. Make sure the boxes and QR code have the right information.")
+                                          message="Team or match number do not match up to list. Make sure the boxes and QR code have the right information.")
 
     # ----------------- CREATING WEBCAM SURFACE -----------------
              
@@ -256,8 +257,9 @@ while True:
         box.draw(surface)
     match_num_input_box.update()
     match_num_input_box.draw(surface)
+
     match_num_text = match_num_input_box.text.strip()
-    match_number = int(match_num_text) if match_num_text != "" else 0
+    num = int(match_num_text) if match_num_text != "" else 0
     if match_num_text != str(match_number):
         match_number = int(match_num_text) if match_num_text != "" else 0
 
@@ -265,6 +267,7 @@ while True:
         for box in team_number_boxes:
             box.text = ''
             box.completed = False
+            match_num_input_box.text = str(num + 1)
 
     # Show the webcam capture surface!
     surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
