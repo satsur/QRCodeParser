@@ -15,6 +15,7 @@ import Utils
 import ConfigManager
 import api.RequestHandler as RequestHandler
 import time
+import os
 
 pygame.init()
 ConfigManager.load_config()
@@ -26,6 +27,10 @@ QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner
         "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," \
         "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
 APP_BG_COLOR = pygame.Color((51,51,51))
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
+
 
 # Determine if user wants to use the last path or choose a new one:
 last_path = ConfigManager.get_config()['last_path']
@@ -54,12 +59,10 @@ TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size fo
 NORMAL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22) # normal text size font
 SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 12) # small text size font
 FONT_COLOR = pygame.Color((255,150,0))
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+
 
 # ----------------- SCREEN ELEMENTS/SURFACES -----------------
 pygame.display.set_caption(APP_NAME)
-surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 
 setup_list_surf = SMALL_FONT.render(f"SETUP LIST: {SETUP_LIST_PATH}", True, FONT_COLOR)
@@ -230,6 +233,8 @@ while True:
                     yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
                     if yesno == False:
                         event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+                        if event_key is None:
+                            break
                 ConfigManager.set_config("event_key", event_key)
                 match_data = RequestHandler.load_match_data_from_api(event_key)
                 RequestHandler.store_matches(match_data)
@@ -241,7 +246,11 @@ while True:
                 event_key = ConfigManager.get_config()["event_key"]
                 event_data = RequestHandler.get_stored_match_data(event_key)
                 if event_data is None:
-                    tkinter.messagebox.askokcancel(title=APP_NAME, message=f"Data for event {event_key} has not been stored.")
+                    stored_event_key = RequestHandler.get_stored_event_key()
+                    tkinter.messagebox.showerror(title=APP_NAME, message=f"Event key and event data don't match. \n" \
+                                                    f"Config event key: {event_key}.\n" \
+                                                    f"Stored event data: {stored_event_key} \n" \
+                                                    f"If you have access to the Internet, press the 'Load Teams' button to get data for the desired competition. ")
                     break
                 teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
                 if teams_in_match == None:
