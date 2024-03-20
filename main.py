@@ -29,10 +29,11 @@ QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner
 APP_BG_COLOR = pygame.Color((51,51,51))
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+
+# ----------------- DISPLAY SURFACE -----------------
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
 
-
-# Determine if user wants to use the last path or choose a new one:
+# ----------------- CHOOSING FILE DIRECTORY -----------------
 last_path = ConfigManager.get_config()['last_path']
 result = tkinter.messagebox.askquestion(title=APP_NAME, message=f'Would you like to use {last_path} again?')
 if result == tkinter.messagebox.YES:
@@ -54,10 +55,11 @@ else:
     tkinter.messagebox.askokcancel(title=APP_NAME, message="Please select a directory that contains the necessary files (eventList.csv, setupList.csv, qrStrings.txt).")
     pygame.quit()
     exit()
-    
+
+# ----------------- FONT DETAILS -----------------
 TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size font
-NORMAL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 22) # normal text size font
-SMALL_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 12) # small text size font
+NORMAL_FONT = pygame.font.Font("fonts/ChakraPetch-Bold.ttf", 22) # normal text size font
+SMALL_FONT = pygame.font.Font("fonts/Sintony-Bold.ttf", 13) # small text size font
 FONT_COLOR = pygame.Color((255,150,0))
 
 
