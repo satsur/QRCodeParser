@@ -43,14 +43,12 @@ else:
     # show an "Open" dialog box and return the path to the selected file
     STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
     dir = tkinter.filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
-SETUP_LIST_PATH = Utils.find_files("setupList.csv", dir)
-EVENT_LIST_PATH = Utils.find_files("eventList.csv", dir)
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 
 # Add paths to config
-if SETUP_LIST_PATH != None and EVENT_LIST_PATH != None and QR_STRINGS_PATH != None:
+if  QR_STRINGS_PATH != None:
     ConfigManager.set_config('last_path', dir)
-    ConfigManager.set_config("paths", {"qr_strings": QR_STRINGS_PATH, "event_list": EVENT_LIST_PATH, "setup_list": SETUP_LIST_PATH})
+    ConfigManager.set_config("paths", {"qr_strings": QR_STRINGS_PATH})
 else:
     tkinter.messagebox.askokcancel(title=APP_NAME, message="Please select a directory that contains the necessary files (eventList.csv, setupList.csv, qrStrings.txt).")
     pygame.quit()
@@ -67,8 +65,6 @@ FONT_COLOR = pygame.Color((255,150,0))
 pygame.display.set_caption(APP_NAME)
 title_surface = TITLE_FONT.render("Mercury 1089 QR Code Parser", True, pygame.Color("white"))
 
-setup_list_surf = SMALL_FONT.render(f"SETUP LIST: {SETUP_LIST_PATH}", True, FONT_COLOR)
-event_list_surf = SMALL_FONT.render(f"EVENT LIST: {EVENT_LIST_PATH}", True, FONT_COLOR) # Orange (255,150,0)
 qr_strings_surf = SMALL_FONT.render(f"QR STRINGS: {QR_STRINGS_PATH}", True, FONT_COLOR)
 
 # 10 pixel margins between each box (vertically and horizontally)
@@ -159,8 +155,6 @@ while True:
                     tkinter.messagebox.showerror(title=APP_NAME, message="A QR code has already been submitted with this team number.")
                     duplicate_string = True
                 else:
-                    Processor.write_to_event_list(EVENT_LIST_PATH, qr_string)
-                    Processor.write_to_setup_list(SETUP_LIST_PATH, qr_string)
                     Processor.write_full_str(QR_STRINGS_PATH, qr_string)
                     box.completed = True
                     # Show last scanned string 
@@ -295,8 +289,6 @@ while True:
     surface.blit(match_num_text_surf, (match_num_input_box.rect.x - match_num_text_surf.get_width(), match_num_input_box.rect.y + match_num_input_box.rect.height/2))
     surface.blit(box_instructions_surf, (team_num_r1.rect.x, team_num_r1.rect.y - box_instructions_surf.get_height()-10))
     # Display file paths in bottom left
-    surface.blit(setup_list_surf, (20, SCREEN_HEIGHT - 3 * setup_list_surf.get_height() - 10))
-    surface.blit(event_list_surf, (20, SCREEN_HEIGHT - 2 * event_list_surf.get_height() - 10))
     surface.blit(qr_strings_surf, (20, SCREEN_HEIGHT - 1 * qr_strings_surf.get_height() - 10))
     # Display box for editing the last scanned qr string
     surface.blit(last_string_text, (0.5 * SCREEN_WIDTH - last_string_text.get_width()/2, 0.85 * SCREEN_HEIGHT + 10))
