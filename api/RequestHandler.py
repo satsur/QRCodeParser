@@ -55,6 +55,7 @@ def get_stored_match_data(event_key:str):
     with open(DATA_FILE, 'r') as file:
         return json.load(file)
 
+# set_number is the "match number" in eliminations - match_number refers to the match # in each bo3 round in elims
 def compose_match_lookup_key(event_key:str, type: MatchTypes=MatchTypes.QUALIFICATION, set_number=1, match_number=1):
     if type == MatchTypes.QUALIFICATION:
         return f"{event_key}_qm{match_number}"
