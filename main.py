@@ -87,6 +87,7 @@ clear_button = Button("clear", team_num_r1.rect.x, team_num_r3.rect.y+BOX_HEIGHT
 get_teams_button = Button("get_teams", team_num_b1.rect.x, team_num_b3.rect.y+BOX_HEIGHT+MARGIN, BOX_WIDTH, BOX_HEIGHT, "Get Teams")
 # LOAD TEAMS fetches event match data from TheBlueAlliance API and stores in locally
 load_teams_button = Button("load_teams", 10, 10, BOX_WIDTH, BOX_HEIGHT, "Load Teams")
+reload_config_button = Button("reload_config", SCREEN_WIDTH-BOX_WIDTH-10, 10, BOX_WIDTH, BOX_HEIGHT, "Reload Config")
 
 last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
 edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2, 
@@ -99,7 +100,7 @@ edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2,
 team_number_boxes = [team_num_r1, team_num_r2, team_num_r3, team_num_b1, team_num_b2, team_num_b3]
 input_boxes = team_number_boxes + [match_num_input_box]
 # Reminder to add edit_button and load_teams_button back, removed it for competition because of bugs
-buttons = [clear_button, edit_button, load_teams_button, get_teams_button]
+buttons = [clear_button, edit_button, load_teams_button, get_teams_button, reload_config_button]
 
 # ----------------- VIDEO CAPTURE -----------------
 
@@ -112,7 +113,7 @@ print("fps:", fps)
 # Else just have this be 1-30 fps
 cap.set(cv2.CAP_PROP_FPS, 60)
 
-# ----------------- GAME LOOP -----------------
+# ----------------- "GAME" LOOP -----------------
 match_number = 1
 last_scan_time = 0
 
@@ -223,7 +224,7 @@ while True:
             if button.name == "load_teams" and button.active:
                 button.active = False
                 event_key = ConfigManager.get_config()["event_key"]
-                if event_key == None:
+                if event_key is None:
                     event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
                 else:
                     yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
@@ -231,9 +232,21 @@ while True:
                         event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
                         if event_key is None:
                             break
-                ConfigManager.set_config("event_key", event_key)
-                match_data = RequestHandler.load_match_data_from_api(event_key)
-                RequestHandler.store_matches(match_data)
+                try:
+                    match_data = RequestHandler.load_match_data_from_api(event_key)
+                except Exception as e:
+                    print(e)
+                    tkinter.messagebox.showerror(title=APP_NAME, message=f"Unable to connect. Make sure you have a stable internet connection.")
+                    break
+                if match_data is None:
+                    tkinter.messagebox.showerror(title=APP_NAME, message=f"The event key '{event_key}' is invalid.")
+                    break
+                try:
+                    RequestHandler.store_matches(match_data)
+                    ConfigManager.set_config("event_key", event_key)
+                except IndexError:
+                    tkinter.messagebox.showerror(title=APP_NAME, message="Match data doesn't seem to exist for the given event. \n"\
+                                                 "This may mean that the match schedule has not been released on TBA. Please try again later")
                 tkinter.messagebox.showinfo(title=APP_NAME, message=f"Data for event {event_key} has been fetched and stored.")
 
             # GET TEAMS BUTTON
@@ -249,7 +262,7 @@ while True:
                                                     f"If you have access to the Internet, press the 'Load Teams' button to get data for the desired competition. ")
                     break
                 teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
-                if teams_in_match == None:
+                if teams_in_match is None:
                     tkinter.messagebox.showerror(title=APP_NAME, message="No teams exist for that match.")
                     break
                 for i in range(len(team_number_boxes)):
@@ -258,7 +271,16 @@ while True:
                     else:
                         team_number_boxes[i].text = teams_in_match["blue"][i-3]
                 ConfigManager.set_config("event_key", event_key)
-                                    
+            
+            # RELOAD CONFIG BUTTON - Will overwrite file directory in config stored in memory (file won't be updated with new dir upon close)
+            # If you make changes to the file while the program is running, you must reload config for it to update in memory
+            if button.name == "reload_config" and button.active:
+                button.active = False
+                # Yes = True, No = False
+                warning = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Reloading configuration will overwrite the file directory stored in memory. \n" \
+                                               + "Press 'Yes' to continue.", icon=tkinter.messagebox.WARNING)
+                if warning:
+                    ConfigManager.load_config() # Loads config from config.yml into memory
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
     
     count_completed = 0
