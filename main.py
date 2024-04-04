@@ -145,6 +145,13 @@ while True:
         qr_string = decoded_info[0].data.decode("utf-8")
         # print("QR String: " + qr_string)
 
+        # If QR code is not in the right format (e.g. someone scans an external QR code), display an error & skip processing (so it doesn't crash)
+        if not Processor.is_correct_format(qr_string):
+            tkinter.messagebox.showwarning(title="AHHHHHHHHHHHHHHHHH", message=f"AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH\n    "\
+                                           "That's not the right QR code... \n" \
+                                            "Please see your nearest strategy member for servicing :D")
+            continue
+
         qr_string_team_number = Processor.get_team_number(qr_string)
         qr_string_match_num = Processor.get_match_number(qr_string)
         num_in_boxes = False

@@ -37,3 +37,8 @@ def get_team_number(full_str:str) -> str:
 
 def get_match_number(full_str:str) -> str:
     return full_str.split(",")[2]
+
+# Make sure qr string is a csv value and contains "Auton" and "Teleop" (should be in all strings regardless of that year's game)
+def is_correct_format(full_str:str) -> bool:
+    values = full_str.split(',')
+    return len(values) > 0 and "Auton" in values and "Teleop" in values
