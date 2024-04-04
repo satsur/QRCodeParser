@@ -25,5 +25,8 @@ def write_config():
 def get_config():
     return config
 
+# Writes data to config as it's changed in memory only because config file is small
+# This isn't feasible with large config files that are constantly being modified or rewritten
 def set_config(key:str, val):
     config[key] = val
+    write_config()
