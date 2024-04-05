@@ -7,7 +7,6 @@ import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.simpledialog
 import numpy as np
-import pyautogui
 import Processor
 from components.InputBox import InputBox
 from components.Button import Button
@@ -91,7 +90,7 @@ reload_config_button = Button("reload_config", SCREEN_WIDTH-BOX_WIDTH-10, 10, BO
 
 last_string_text = NORMAL_FONT.render("No QR code has been scanned", True, FONT_COLOR)
 edit_button = Button("edit", 0.75 * SCREEN_WIDTH - BOX_WIDTH/2, 
-                     0.80*SCREEN_HEIGHT,
+                     clear_button.rect.y + BOX_HEIGHT + MARGIN,
                      BOX_WIDTH,
                      BOX_HEIGHT,
                      "Edit!", 
@@ -103,9 +102,9 @@ input_boxes = team_number_boxes + [match_num_input_box]
 buttons = [clear_button, edit_button, load_teams_button, get_teams_button, reload_config_button]
 
 # ----------------- VIDEO CAPTURE -----------------
-
-# 0 Is the built in camera
+# 0 Is the built in camera, change to 1 if using webcam
 cap = cv2.VideoCapture(0)
+print(cap.read())
 # Gets fps of your camera
 fps = cap.get(cv2.CAP_PROP_FPS)
 print("fps:", fps)
