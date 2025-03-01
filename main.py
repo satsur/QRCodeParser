@@ -274,6 +274,7 @@ while True:
                     tkinter.messagebox.showerror(title=APP_NAME, message="No teams exist for that match.")
                     break
                 for i in range(len(team_number_boxes)):
+                    team_number_boxes[i].completed = False
                     if i < 3:
                         team_number_boxes[i].text = teams_in_match["red"][i]
                     else:
