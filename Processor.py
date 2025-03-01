@@ -33,10 +33,10 @@ def replace_last_entry(new_str:str):
     write_full_str(paths[0], new_str)
 
 def get_team_number(full_str:str) -> str:
-    return full_str.split(",")[1]
+    return full_str.split(",")[0]
 
 def get_match_number(full_str:str) -> str:
-    return full_str.split(",")[2]
+    return full_str.split(",")[1]
 
 # Make sure qr string is a csv value and contains "Auton" and "Teleop" (should be in all strings regardless of that year's game)
 def is_correct_format(full_str:str) -> bool:

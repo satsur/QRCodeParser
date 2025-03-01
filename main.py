@@ -22,9 +22,11 @@ ConfigManager.load_config()
 # ----------------- CONSTANTS -----------------
 
 APP_NAME = "QR Code Parser - Mercury 1089"
-QR_STRING = "ScouterName,TeamNumber,MatchNumber,AlliancePartner1,AlliancePartner2,AllianceColor,PreloadNote,NoShow,FellOver," \
-        "Leave,Park,Stage,Auton,NumberPickedUp,ScoredSpeaker,MissedSpeaker,ScoredAmp,MissedAmp,Teleop,NumberPickedUp,ScoredSpeaker," \
-        "MissedSpeaker,ScoredAmp,MissedAmp,ScoredTrap,MissedTrap"
+QR_STRING = "TeamNumber, MatchNumber, AlliancePartner1, AlliancePartner2, AllianceColor, Preload, NoShow, FellOver, Leave, Defense, Park, Hang, " \
+    "AUTON, CORAL, L4ScoredCoral, L3ScoredCoral, L2ScoredCoral, L1ScoredCoral, L4MissedCoral, L3MissedCoral, L2MissedCoral, L1MissedCoral, PickedUpCoral, " \
+        "ALGAE, L3RemovedAlgae, L2RemovedAlgae, L3FailedAlgae, L2FailedAlgae, ScoredProcessor, MissedProcessor, ScoredNet, MissedNet, PickedUpAlgae, "\
+    "TELEOP, CORAL, L4ScoredCoral, L3ScoredCoral, L2ScoredCoral, L1ScoredCoral, L4MissedCoral, L3MissedCoral, L2MissedCoral, L1MissedCoral, PickedUpCoral, " \
+        "ALGAE, L3RemovedAlgae, L2RemovedAlgae, L3FailedAlgae, L2FailedAlgae, ScoredProcessor, MissedProcessor, ScoredNet, MissedNet, PickedUpAlgae, ScouterName"
 APP_BG_COLOR = pygame.Color((51,51,51))
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -40,7 +42,7 @@ if result == tkinter.messagebox.YES:
 else:
     Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
     # show an "Open" dialog box and return the path to the selected file
-    STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2024 Crescendo"
+    STRAT_FOLDER = "C:\\Users\\Mercury1089\\Desktop\\Strategy\\2025 Reefscape"
     dir = tkinter.filedialog.askdirectory(initialdir=STRAT_FOLDER, title="Please select the directory that contains eventList, setupList, and qr_strings")
 QR_STRINGS_PATH = Utils.find_files("qrStrings.txt", dir)
 
@@ -58,7 +60,6 @@ TITLE_FONT = pygame.font.Font("fonts/Diavlo_BOLD_II_37.otf", 32) # Title-size fo
 NORMAL_FONT = pygame.font.Font("fonts/ChakraPetch-Bold.ttf", 22) # normal text size font
 SMALL_FONT = pygame.font.Font("fonts/Sintony-Bold.ttf", 13) # small text size font
 FONT_COLOR = pygame.Color((255,150,0))
-
 
 # ----------------- SCREEN ELEMENTS/SURFACES -----------------
 pygame.display.set_caption(APP_NAME)
@@ -253,7 +254,8 @@ while True:
                 except IndexError:
                     tkinter.messagebox.showerror(title=APP_NAME, message="Match data doesn't seem to exist for the given event. \n"\
                                                  "This may mean that the match schedule has not been released on TBA. Please try again later")
-                tkinter.messagebox.showinfo(title=APP_NAME, message=f"Data for event {event_key} has been fetched and stored.")
+                else:
+                    tkinter.messagebox.showinfo(title=APP_NAME, message=f"Data for event {event_key} has been fetched and stored.")
 
             # GET TEAMS BUTTON
             if button.name == "get_teams" and button.active:
