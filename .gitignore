@@ -3,5 +3,4 @@
 *.pyc
 config.yml
 *.env
-requirements.txt
 *.json
