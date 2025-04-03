@@ -116,6 +116,7 @@ cap.set(cv2.CAP_PROP_FPS, 60)
 # ----------------- "GAME" LOOP -----------------
 match_number = 1
 last_scan_time = 0
+qr_string = None
 
 while True:
     surface.fill(APP_BG_COLOR)
@@ -224,10 +225,13 @@ while True:
 
             # EDIT BUTTON
             if button.name == "edit" and button.active:
-                edit_prompt = tkinter.simpledialog.askstring(title=APP_NAME, prompt='Edit the string and click OK.', initialvalue=qr_string)
-                if edit_prompt != None:
-                    Processor.replace_last_entry(edit_prompt)
-                    button.active = False
+                if qr_string == None:
+                    tkinter.messagebox.showerror(title=APP_NAME, message="No QR code has been scanned!")
+                else:
+                    edit_prompt = tkinter.simpledialog.askstring(title=APP_NAME, prompt='Edit the string and click OK.', initialvalue=qr_string)
+                    if edit_prompt != None:
+                        Processor.replace_last_entry(edit_prompt)
+                        button.active = False
             if button.name == "load_teams" and button.active:
                 button.active = False
                 event_key = ConfigManager.get_config()["event_key"]
