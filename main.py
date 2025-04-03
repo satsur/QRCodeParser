@@ -30,6 +30,8 @@ QR_STRING = "TeamNumber, MatchNumber, AlliancePartner1, AlliancePartner2, Allian
 APP_BG_COLOR = pygame.Color((51,51,51))
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+FPS = 30
+FPS_CLOCK = pygame.time.Clock()
 
 # ----------------- DISPLAY SURFACE -----------------
 surface = pygame.display.set_mode([SCREEN_WIDTH,SCREEN_HEIGHT])
@@ -102,6 +104,8 @@ input_boxes = team_number_boxes + [match_num_input_box]
 # Reminder to add edit_button and load_teams_button back, removed it for competition because of bugs
 buttons = [clear_button, edit_button, load_teams_button, get_teams_button, reload_config_button]
 
+focused = True
+
 # ----------------- VIDEO CAPTURE -----------------
 # 0 Is the built in camera, change to 1 if using webcam
 cap = cv2.VideoCapture(0)
@@ -121,13 +125,15 @@ qr_string = None
 while True:
     surface.fill(APP_BG_COLOR)
 
+    frame = np.array([])
     # Get frame from video
-    success, frame = cap.read()
-    if not success:
-        break
+    if focused:
+        success, frame = cap.read()
+        if not success:
+            break
  
     # Process Frame - Detect and decode QR Code from frame
-    decoded_info = decode(frame)
+    decoded_info = decode(frame) if frame.size > 0 else []
     # print(decoded_info)
 
     if (len(decoded_info) > 1): # Don't want to scan two QR codes at once
@@ -178,13 +184,14 @@ while True:
     # ----------------- CREATING WEBCAM SURFACE -----------------
              
     # Flip image because the frames appeared inverted by default
-    frame = np.fliplr(frame)
-    frame = np.rot90(frame)
+    if focused:
+        frame = np.fliplr(frame)
+        frame = np.rot90(frame)
 
-    # The capture uses BGR colors and PyGame needs RGB
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # The capture uses BGR colors and PyGame needs RGB
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    webcam_surf = pygame.surfarray.make_surface(frame)
+        webcam_surf = pygame.surfarray.make_surface(frame)
 
     # ----------------- EVENT LISTENERS -----------------
 
@@ -194,6 +201,9 @@ while True:
             ConfigManager.write_config()
             pygame.quit()
             exit()
+        if event.type == pygame.ACTIVEEVENT:
+            if event.state == 2: # means focus changed
+                focused = event.gain # 1 = focus gained, 0 = focus lost
         if event.type == pygame.KEYDOWN:
             # press TAB or ENTER
             if event.key == pygame.K_TAB or event.key == pygame.K_RETURN:
@@ -294,6 +304,7 @@ while True:
                                                + "Press 'Yes' to continue.", icon=tkinter.messagebox.WARNING)
                 if warning:
                     ConfigManager.load_config() # Loads config from config.yml into memory
+        FPS_CLOCK.tick(FPS)
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
     
     count_completed = 0
@@ -318,7 +329,8 @@ while True:
             match_num_input_box.text = str(num + 1)
 
     # Show the webcam capture surface!
-    surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
+    if focused:
+        surface.blit(webcam_surf, (20 , SCREEN_HEIGHT / 2 - webcam_surf.get_height() / 2))
     # Show title and instructions
     surface.blit(title_surface, (SCREEN_WIDTH / 2 - title_surface.get_width() / 2, 20))
     surface.blit(match_num_text_surf, (match_num_input_box.rect.x - match_num_text_surf.get_width(), match_num_input_box.rect.y + match_num_input_box.rect.height/2))
