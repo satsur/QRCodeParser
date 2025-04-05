@@ -10,6 +10,7 @@ def load_config():
     with open("config.yml", 'r') as stream:
         try:
            config = yaml.safe_load(stream)
+           print("Config" + str(config))
         except yaml.YAMLError as exc:
             print(exc)
 

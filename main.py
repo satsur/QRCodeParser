@@ -105,6 +105,7 @@ input_boxes = team_number_boxes + [match_num_input_box]
 buttons = [clear_button, edit_button, load_teams_button, get_teams_button, reload_config_button]
 
 focused = True
+first_open = True
 
 # ----------------- VIDEO CAPTURE -----------------
 # 0 Is the built in camera, change to 1 if using webcam
@@ -122,8 +123,40 @@ match_number = 1
 last_scan_time = 0
 qr_string = None
 
+def get_teams():
+    event_key = ConfigManager.get_config()["event_key"]
+    event_data = RequestHandler.get_stored_match_data(event_key)
+    if event_data is None:
+        stored_event_key = RequestHandler.get_stored_event_key()
+        tkinter.messagebox.showerror(title=APP_NAME, message=f"Event key and event data don't match. \n" \
+                                        f"Config event key: {event_key}.\n" \
+                                        f"Stored event data: {stored_event_key} \n" \
+                                        f"If you have access to the Internet, press the 'Load Teams' button to get data for the desired competition. ")
+        return
+    teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
+    if teams_in_match is None:
+        tkinter.messagebox.showerror(title=APP_NAME, message="No teams exist for that match.")
+        return
+    for i in range(len(team_number_boxes)):
+        team_number_boxes[i].completed = False
+        if i < 3:
+            team_number_boxes[i].text = teams_in_match["red"][i]
+        else:
+            team_number_boxes[i].text = teams_in_match["blue"][i-3]
+    ConfigManager.set_config("event_key", event_key)
+
 while True:
     surface.fill(APP_BG_COLOR)
+
+    # On first open, if there is a previous string, autofill the ui with information for 
+    # the next logical match (i.e. increment match number by one from last qr string and autofill team numbers)
+    if first_open:
+        first_open = False
+        last_string = Processor.get_last_full_string()
+        if last_string != "":
+            match_number = int(Processor.get_match_number(Processor.get_last_full_string())) + 1
+            match_num_input_box.text = str(match_number)
+            get_teams_button.active = True # This will trigger the autofill
 
     frame = np.array([])
     # Get frame from video
@@ -274,26 +307,7 @@ while True:
             # GET TEAMS BUTTON
             if button.name == "get_teams" and button.active:
                 button.active = False
-                event_key = ConfigManager.get_config()["event_key"]
-                event_data = RequestHandler.get_stored_match_data(event_key)
-                if event_data is None:
-                    stored_event_key = RequestHandler.get_stored_event_key()
-                    tkinter.messagebox.showerror(title=APP_NAME, message=f"Event key and event data don't match. \n" \
-                                                    f"Config event key: {event_key}.\n" \
-                                                    f"Stored event data: {stored_event_key} \n" \
-                                                    f"If you have access to the Internet, press the 'Load Teams' button to get data for the desired competition. ")
-                    break
-                teams_in_match = RequestHandler.get_teams_in_match(event_data, match_number, RequestHandler.MatchTypes.QUALIFICATION)
-                if teams_in_match is None:
-                    tkinter.messagebox.showerror(title=APP_NAME, message="No teams exist for that match.")
-                    break
-                for i in range(len(team_number_boxes)):
-                    team_number_boxes[i].completed = False
-                    if i < 3:
-                        team_number_boxes[i].text = teams_in_match["red"][i]
-                    else:
-                        team_number_boxes[i].text = teams_in_match["blue"][i-3]
-                ConfigManager.set_config("event_key", event_key)
+                get_teams()
             
             # RELOAD CONFIG BUTTON - Will overwrite file directory in config stored in memory (file won't be updated with new dir upon close)
             # If you make changes to the file while the program is running, you must reload config for it to update in memory
@@ -305,6 +319,7 @@ while True:
                 if warning:
                     ConfigManager.load_config() # Loads config from config.yml into memory
         FPS_CLOCK.tick(FPS)
+
     # ----------------- DISPLAY (BLIT) ELEMENTS ON SCREEN -----------------
     
     count_completed = 0
@@ -327,6 +342,7 @@ while True:
             box.text = ''
             box.completed = False
             match_num_input_box.text = str(num + 1)
+            get_teams()
 
     # Show the webcam capture surface!
     if focused:

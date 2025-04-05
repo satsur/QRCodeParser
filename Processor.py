@@ -8,7 +8,7 @@ def strip_commas(full_str:str) -> str:
 
 # Get file paths from config
 def get_data_file_path():
-    return ConfigManager.get_config()['paths'][0]
+    return ConfigManager.get_config()['paths']['qr_strings']
 
 def write_full_str(path:str, full_str:str):
     with open(path, 'a') as file:
@@ -32,6 +32,15 @@ def replace_last_entry(new_str:str):
                 file.write(line)
     # 0: qrStrings, 1: eventList, 2: setupList
     write_full_str(paths[0], new_str)
+
+def get_last_full_string():
+    path = get_data_file_path()
+    with open(path, 'r+') as file:
+        lines = file.readlines()
+        if len(lines) < 2:
+            return ""
+        return lines[len(lines)-1]
+    
 
 def get_team_number(full_str:str) -> str:
     return full_str.split(",")[1]
