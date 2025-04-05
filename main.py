@@ -145,6 +145,40 @@ def get_teams():
             team_number_boxes[i].text = teams_in_match["blue"][i-3]
     ConfigManager.set_config("event_key", event_key)
 
+def clear_team_number_boxes():
+    for box in team_number_boxes:
+        box.text = ''
+        box.completed = False
+
+def load_teams():
+    event_key = ConfigManager.get_config()["event_key"]
+    if event_key is None:
+        event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+    else:
+        yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
+        if yesno == False:
+            event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
+            if event_key is None:
+                return
+    try:
+        match_data = RequestHandler.load_match_data_from_api(event_key)
+    except Exception as e:
+        print(e)
+        tkinter.messagebox.showerror(title=APP_NAME, message=f"Unable to connect. Make sure you have a stable internet connection.")
+        return
+    if match_data is None:
+        tkinter.messagebox.showerror(title=APP_NAME, message=f"The event key '{event_key}' is invalid.")
+        return
+    try:
+        RequestHandler.store_matches(match_data)
+        ConfigManager.set_config("event_key", event_key)
+    except IndexError:
+        tkinter.messagebox.showerror(title=APP_NAME, message="Match data doesn't seem to exist for the given event. \n"\
+                                        "This may mean that the match schedule has not been released on TBA. Please try again later")
+    else:
+        tkinter.messagebox.showinfo(title=APP_NAME, message=f"Data for event {event_key} has been fetched and stored.")
+
+
 while True:
     surface.fill(APP_BG_COLOR)
 
@@ -262,9 +296,7 @@ while True:
             # CLEAR BUTTON
             if button.name == "clear" and button.active:
                 button.active = False
-                for box in team_number_boxes:
-                    box.text = ''
-                    box.completed = False
+                clear_team_number_boxes()
 
             # EDIT BUTTON
             if button.name == "edit" and button.active:
@@ -277,33 +309,7 @@ while True:
                         button.active = False
             if button.name == "load_teams" and button.active:
                 button.active = False
-                event_key = ConfigManager.get_config()["event_key"]
-                if event_key is None:
-                    event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
-                else:
-                    yesno = tkinter.messagebox.askyesno(title=APP_NAME, message=f"Would you like to use the event key {event_key} again?")
-                    if yesno == False:
-                        event_key = tkinter.simpledialog.askstring(title=APP_NAME, prompt="Please enter the event key (including the year)")
-                        if event_key is None:
-                            break
-                try:
-                    match_data = RequestHandler.load_match_data_from_api(event_key)
-                except Exception as e:
-                    print(e)
-                    tkinter.messagebox.showerror(title=APP_NAME, message=f"Unable to connect. Make sure you have a stable internet connection.")
-                    break
-                if match_data is None:
-                    tkinter.messagebox.showerror(title=APP_NAME, message=f"The event key '{event_key}' is invalid.")
-                    break
-                try:
-                    RequestHandler.store_matches(match_data)
-                    ConfigManager.set_config("event_key", event_key)
-                except IndexError:
-                    tkinter.messagebox.showerror(title=APP_NAME, message="Match data doesn't seem to exist for the given event. \n"\
-                                                 "This may mean that the match schedule has not been released on TBA. Please try again later")
-                else:
-                    tkinter.messagebox.showinfo(title=APP_NAME, message=f"Data for event {event_key} has been fetched and stored.")
-
+                load_teams()
             # GET TEAMS BUTTON
             if button.name == "get_teams" and button.active:
                 button.active = False
